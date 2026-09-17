@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import replace
 from typing import Any
 
 from .catalog import resolve_gateway
@@ -23,7 +24,7 @@ class AgentRouter:
 
     def __init__(
         self,
-        provider: str = "local",
+        provider: str | None = None,
         *,
         api_key: str | None = None,
         jev_base_url: str | None = None,
@@ -33,11 +34,10 @@ class AgentRouter:
         settings: Settings | None = None,
     ) -> None:
         env = settings or Settings.from_env()
-        name = provider.strip().lower()
+        requested = (provider if provider is not None else env.provider or "auto").strip().lower()
         use_env_defaults = settings is not None
-        self.provider_name = name
         self.settings = Settings(
-            provider=name,
+            provider=requested,
             jev_api_key=_coalesce(api_key, env.jev_api_key),
             jev_base_url=_coalesce(jev_base_url, env.jev_base_url),
             jev_model=env.jev_model,
@@ -47,10 +47,10 @@ class AgentRouter:
             models_file=env.models_file,
             llm_default=env.llm_default,
             llm_strategy=env.llm_strategy,
-            min_confidence=env.min_confidence if (name == "jev" or use_env_defaults) else 0.15,
+            min_confidence=env.min_confidence,
             max_alternatives=env.max_alternatives,
             max_candidates=env.max_candidates,
-            redact_secrets=env.redact_secrets if use_env_defaults else name in {"jev", "custom"},
+            redact_secrets=env.redact_secrets,
             host=env.host,
             port=env.port,
             auth_token=env.auth_token,
@@ -63,7 +63,42 @@ class AgentRouter:
             w_latency=env.w_latency,
             request_timeout=env.request_timeout,
         )
+        if requested in {"", "auto"}:
+            name = "jev" if self._probe_jev() else "local"
+        else:
+            name = requested
+        if not use_env_defaults:
+            self.settings = replace(
+                self.settings,
+                min_confidence=env.min_confidence if name == "jev" else 0.15,
+                redact_secrets=name in {"jev", "custom"},
+            )
+        self.provider_name = name
+        self.settings = replace(self.settings, provider=name)
         self._validate()
+
+    def _gateway_ready(self, settings: Settings | None = None) -> bool:
+        current = settings or self.settings
+        ollama = (current.gateway_base_url or "").rstrip("/").endswith("11434/v1")
+        return bool(
+            current.gateway_base_url
+            and current.gateway_model
+            and (current.gateway_api_key or ollama)
+        )
+
+    def _probe_jev(self) -> bool:
+        if not (self.settings.jev_api_key and self.settings.jev_base_url):
+            return False
+        if self._gateway_ready():
+            return True
+        try:
+            probed = self._with_gateway()
+        except ConfigurationError:
+            return False
+        if self._gateway_ready(probed):
+            self.settings = probed
+            return True
+        return False
 
     def _validate(self) -> None:
         if self.provider_name not in {"local", "mock", "custom", "jev"}:

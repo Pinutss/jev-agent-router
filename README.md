@@ -29,7 +29,7 @@ uv run jev-agent demo
 uv run jev-agent serve
 ```
 
-`provider=local` by default if you do not set keys. Docker:
+No agent and no LLM are required. `JEV_PROVIDER=auto` (the default) stays on the local heuristic. If JEV and a gateway are configured, they are used as the judge. Docker:
 
 ```bash
 docker compose up
@@ -128,7 +128,7 @@ uv run jev-agent llms
 
 `GET /v1/llms` lists the public catalog (`has_key`, `api_key_env`), never the raw key. To pick the judge from the call: `gateway_provider`, `gateway_model`, `llm_prefer`.
 
-`JEV_PROVIDER=jev` will not start if JEV or no usable LLM is configured.
+`JEV_PROVIDER=jev` will not start if JEV or no usable LLM is configured. With `auto`, missing keys just keep the local heuristic.
 
 ## HTTP
 
