@@ -1,16 +1,25 @@
 # jev-agent-router
 
-Sélection explicable des agents IA selon la tâche et leurs capacités.
+Picks the agent that fits the task, then explains, abstains, or falls back once.
 
-Auteur : [Pinuts](https://github.com/Pinutss). Licence MIT.
+Author: [Pinuts](https://github.com/Pinutss). MIT license.
 
-Fait partie de [JEV Labs](https://github.com/Pinutss/jev-labs).
+Part of [JEV Labs](https://github.com/Pinutss/jev-labs).
 
-Stack : Python 3.10+, HTTP, MCP stdio, Docker, HTML de démo.
+Stack: Python 3.10+, HTTP, MCP stdio, Docker, HTML demo.
 
-Après `jev-agent serve` : [démo](http://127.0.0.1:8080/)
+After `jev-agent serve`: [demo](http://127.0.0.1:8080/)
 
-## Local, sans clé
+<p>
+  <img src="docs/preview/01-problem.png" alt="The problem" width="49%">
+  <img src="docs/preview/02-solution.png" alt="The solution" width="49%">
+</p>
+<p>
+  <img src="docs/preview/03-permissions.png" alt="Permissions and fallback" width="49%">
+  <img src="docs/preview/04-works-everywhere.png" alt="Works everywhere" width="49%">
+</p>
+
+## Local, no keys
 
 ```bash
 git clone https://github.com/Pinutss/jev-agent-router
@@ -20,56 +29,42 @@ uv run jev-agent demo
 uv run jev-agent serve
 ```
 
-`provider=local` par défaut si tu ne mets pas de clés. Docker :
+`provider=local` by default if you do not set keys. Docker:
 
 ```bash
 docker compose up
 ```
 
-## Ce que fait le prototype
+## What the prototype does
 
-Le routeur choisit un agent dans un registre. Il justifie, s'abstient s'il n'y a pas de candidat sûr, et n'autorise qu'un seul saut de repli.
+The router chooses an agent from a registry. It explains the choice, abstains if no candidate is safe, and allows only one fallback hop.
 
-Il n'exécute pas les agents et ne les fournit pas.
+It does not run agents and does not ship them.
 
-Les permissions viennent uniquement du registre et des contraintes de l'appelant. La tâche, un outil ou un modèle ne peuvent pas en ajouter.
+Permissions come only from the registry and the caller constraints. The task, a tool, or a model cannot add them.
 
-## Python
+## Hermes and OpenClaw
 
-```python
-from jev_agent_router import AgentRouter, DEFAULT_AGENTS
-
-result = AgentRouter(provider="local").route(
-    task="Corriger le bug CORS dans l'API FastAPI",
-    agents=DEFAULT_AGENTS,
-    required_permissions=["read_code"],
-    scope="demo",
-)
-print(result.decision, result.selected.id if result.selected else result.abstain_reason)
-```
-
-## Hermes et OpenClaw
-
-Oui, en local. Le process MCP n'a pas besoin de JEV ni de gateway :
+Yes, locally. The MCP process does not need JEV or a gateway:
 
 ```bash
 uv run jev-agent mcp
 ```
 
-Un tool : `agent_route`. Tu lui passes `task` + `agents`. Tes clés restent dans l'environnement du process, pas dans l'appel.
+One tool: `agent_route`. Pass `task` + `agents`. Keys stay in the process environment, not in the call.
 
-**Hermes** (`~/.hermes/config.yaml`) :
+**Hermes** (`~/.hermes/config.yaml`):
 
 ```yaml
 mcp_servers:
   jev-agent:
     command: uv
-    args: ["run", "--directory", "/chemin/vers/jev-agent-router", "jev-agent", "mcp"]
+    args: ["run", "--directory", "/path/to/jev-agent-router", "jev-agent", "mcp"]
     env:
       JEV_PROVIDER: local
 ```
 
-**OpenClaw** (`~/.openclaw/openclaw.json`, ou Settings > MCP > Stdio) :
+**OpenClaw** (`~/.openclaw/openclaw.json`, or Settings > MCP > Stdio):
 
 ```json
 {
@@ -77,7 +72,7 @@ mcp_servers:
     "servers": {
       "jev-agent": {
         "command": "uv",
-        "args": ["run", "--directory", "/chemin/vers/jev-agent-router", "jev-agent", "mcp"],
+        "args": ["run", "--directory", "/path/to/jev-agent-router", "jev-agent", "mcp"],
         "env": { "JEV_PROVIDER": "local" }
       }
     }
@@ -85,13 +80,27 @@ mcp_servers:
 }
 ```
 
-Exemples prêts à copier : `examples/hermes.yaml`, `examples/openclaw.json`.
+Copy-ready examples: `examples/hermes.yaml`, `examples/openclaw.json`.
 
-## JEV + plusieurs LLM (optionnel)
+## Python
 
-Si tu branches le cloud plus tard : `JEV_API_KEY` / `JEV_BASE_URL`, plus une gateway OpenAI-compatible. Les clés restent dans l'environnement, jamais dans le body HTTP ni dans l'appel MCP.
+```python
+from jev_agent_router import AgentRouter, DEFAULT_AGENTS
 
-Une seule clé multi-modèles (OpenRouter) :
+result = AgentRouter(provider="local").route(
+    task="Fix the CORS bug in the FastAPI API",
+    agents=DEFAULT_AGENTS,
+    required_permissions=["read_code"],
+    scope="demo",
+)
+print(result.decision, result.selected.id if result.selected else result.abstain_reason)
+```
+
+## JEV + several LLMs (optional)
+
+If you wire the cloud later: `JEV_API_KEY` / `JEV_BASE_URL`, plus an OpenAI-compatible gateway. Keys stay in the environment, never in the HTTP body or the MCP call.
+
+One multi-model key (OpenRouter):
 
 ```env
 JEV_PROVIDER=jev
@@ -100,7 +109,7 @@ JEV_LLM_DEFAULT=openrouter:anthropic/claude-sonnet-4
 JEV_LLM_STRATEGY=named
 ```
 
-Plusieurs providers :
+Several providers:
 
 ```env
 OPENROUTER_API_KEY=sk-or-...
@@ -110,16 +119,16 @@ JEV_LLM_PROVIDERS=openrouter,openai,groq
 JEV_LLM_STRATEGY=cheapest
 ```
 
-Ou un fichier `examples/models.json` via `JEV_MODELS_FILE`. Le gateway classique `GATEWAY_*` reste valide.
+Or a file such as `examples/models.json` via `JEV_MODELS_FILE`. Classic `GATEWAY_*` still works.
 
 ```bash
 cp .env.example .env
 uv run jev-agent llms
 ```
 
-`GET /v1/llms` liste le catalogue public (`has_key`, `api_key_env`), jamais la clé. Pour choisir le LLM côté appel : `gateway_provider`, `gateway_model`, `llm_prefer`.
+`GET /v1/llms` lists the public catalog (`has_key`, `api_key_env`), never the raw key. To pick the judge from the call: `gateway_provider`, `gateway_model`, `llm_prefer`.
 
-`JEV_PROVIDER=jev` refuse de démarrer si JEV ou aucun LLM configuré ne sont pas là.
+`JEV_PROVIDER=jev` will not start if JEV or no usable LLM is configured.
 
 ## HTTP
 
@@ -127,18 +136,18 @@ uv run jev-agent llms
 uv run jev-agent serve
 ```
 
-`GET /healthz`, `POST /v1/route`. Bind `127.0.0.1`. Le body ne contient pas de clés.
+`GET /healthz`, `POST /v1/route`. Binds `127.0.0.1`. The body must not contain keys.
 
-## Validation locale
+## Local validation
 
 ```bash
 uv run jev-agent benchmark
 ```
 
-Jeu annoté dans `benchmarks/annotated_tasks.json`. C'est une baseline locale, pas un essai JEV réel.
+Annotated set in `benchmarks/annotated_tasks.json`. This is a local baseline, not a live JEV trial.
 
-## Limites
+## Limits
 
-Le tri local est lexical et déterministe. Le scope isole des listes, ce n'est pas une auth. Un seul saut de repli. Pas de runtime agentique. Pas de store, pas de PyPI pour l'instant.
+Local ranking is lexical and deterministic. Scope isolates lists, it is not auth. One fallback hop. No agent runtime. No store, no PyPI yet.
 
-`docs/vision.md` est une cible longue, pas le contrat actuel.
+`docs/vision.md` is a long-term target, not the current contract.
