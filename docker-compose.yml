@@ -1,0 +1,17 @@
+services:
+  router:
+    build: .
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      JEV_PROVIDER: ${JEV_PROVIDER:-local}
+      JEV_AGENT_HOST: 0.0.0.0
+      JEV_AGENT_PORT: 8080
+      JEV_API_KEY: ${JEV_API_KEY:-}
+      JEV_BASE_URL: ${JEV_BASE_URL:-}
+      JEV_MODEL: ${JEV_MODEL:-jev-latest}
+      GATEWAY_BASE_URL: ${GATEWAY_BASE_URL:-}
+      GATEWAY_API_KEY: ${GATEWAY_API_KEY:-}
+      GATEWAY_MODEL: ${GATEWAY_MODEL:-}
+      JEV_REDACT_SECRETS: ${JEV_REDACT_SECRETS:-true}
+      JEV_AGENT_AUTH_TOKEN: ${JEV_AGENT_AUTH_TOKEN:-}

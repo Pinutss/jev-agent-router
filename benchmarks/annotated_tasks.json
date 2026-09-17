@@ -1,0 +1,64 @@
+{
+  "version": "0.1.0",
+  "provider": "local",
+  "notes": "Baseline locale lexicale. Distinguer de tout essai JEV réel.",
+  "cases": [
+    {
+      "id": "coding-bug",
+      "task": "Corriger le bug CORS dans l'API FastAPI",
+      "required_permissions": ["read_code"],
+      "scope": "demo",
+      "expected": "coding-agent",
+      "expected_decision": "select"
+    },
+    {
+      "id": "devops-logs",
+      "task": "Lire les logs Docker de la CI qui a échoué",
+      "required_permissions": ["read_logs"],
+      "scope": "demo",
+      "expected": "devops-agent",
+      "expected_decision": "select"
+    },
+    {
+      "id": "docs-search",
+      "task": "Chercher dans la documentation comment auth marche",
+      "required_permissions": ["read_docs"],
+      "scope": "demo",
+      "expected": "research-agent",
+      "expected_decision": "select"
+    },
+    {
+      "id": "billing-ticket",
+      "task": "Répondre au ticket client sur la facturation",
+      "required_permissions": ["read_tickets"],
+      "scope": "demo",
+      "expected": "support-agent",
+      "expected_decision": "select"
+    },
+    {
+      "id": "no-candidate",
+      "task": "Lancer un déploiement production immédiat",
+      "required_permissions": ["deploy_prod"],
+      "scope": "demo",
+      "expected_decision": "abstain"
+    },
+    {
+      "id": "agent-failed",
+      "task": "Corriger le bug CORS dans l'API FastAPI",
+      "required_permissions": ["read_code"],
+      "failed_agent_id": "coding-agent",
+      "scope": "demo",
+      "expected": "security-agent",
+      "expected_decision": "fallback"
+    },
+    {
+      "id": "agent-absent",
+      "task": "Corriger le bug CORS dans l'API FastAPI",
+      "required_permissions": ["read_code"],
+      "failed_agent_id": "ghost-agent",
+      "scope": "demo",
+      "expected": "coding-agent",
+      "expected_decision": "fallback"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "default": "openrouter:anthropic/claude-sonnet-4",
+  "providers": [
+    {
+      "id": "openrouter",
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "models": [
+        {
+          "id": "anthropic/claude-sonnet-4",
+          "quality": 0.92,
+          "cost": 0.55,
+          "latency": 0.4,
+          "capabilities": ["chat", "tools", "json", "judge", "coding"]
+        },
+        {
+          "id": "openai/gpt-4.1-mini",
+          "quality": 0.75,
+          "cost": 0.18,
+          "latency": 0.22,
+          "capabilities": ["chat", "tools", "json", "judge"]
+        }
+      ]
+    },
+    {
+      "id": "openai",
+      "base_url": "https://api.openai.com/v1",
+      "api_key_env": "OPENAI_API_KEY",
+      "models": [
+        {
+          "id": "gpt-4.1",
+          "quality": 0.9,
+          "cost": 0.5,
+          "latency": 0.35,
+          "capabilities": ["chat", "tools", "json", "judge", "coding"]
+        }
+      ]
+    }
+  ]
+}
