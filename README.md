@@ -80,8 +80,6 @@ mcp_servers:
 }
 ```
 
-Copy-ready examples: `examples/hermes.yaml`, `examples/openclaw.json`.
-
 ## Python
 
 ```python
@@ -119,7 +117,7 @@ JEV_LLM_PROVIDERS=openrouter,openai,groq
 JEV_LLM_STRATEGY=cheapest
 ```
 
-Or a file such as `examples/models.json` via `JEV_MODELS_FILE`. Classic `GATEWAY_*` still works.
+Or a JSON catalog via `JEV_MODELS_FILE`. Classic `GATEWAY_*` still works.
 
 ```bash
 cp .env.example .env
