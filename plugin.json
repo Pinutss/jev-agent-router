@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "jev-agent-router",
+  "version": "0.1.0",
+  "description": "Picks one agent for a task, explains the choice, abstains, or falls back once.",
+  "author": {
+    "name": "Pinuts",
+    "url": "https://github.com/Pinutss"
+  },
+  "homepage": "https://github.com/Pinutss/jev-agent-router",
+  "repository": "https://github.com/Pinutss/jev-agent-router",
+  "license": "MIT",
+  "keywords": [
+    "agent-router",
+    "routing",
+    "permissions",
+    "mcp",
+    "jev"
+  ]
+}

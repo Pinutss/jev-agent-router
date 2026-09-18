@@ -43,6 +43,24 @@ It does not run agents and does not ship them.
 
 Permissions come only from the registry and the caller constraints. The task, a tool, or a model cannot add them.
 
+## Cursor and Hermes plugin
+
+This repository is an [Agent Plugin](https://agent-plugins.org/). Cursor and Hermes can install it directly.
+
+**Hermes**
+
+```bash
+hermes plugins install Pinutss/jev-agent-router --enable
+```
+
+**Cursor**
+
+Install from the [JEV plugins marketplace](https://github.com/Pinutss/jev-plugins), or copy this folder to `~/.cursor/plugins/local/jev-agent-router`.
+
+One tool: `agent_route`. Pass `task` + `agents`. Keys stay in the process environment, not in the call.
+
+Requires [uv](https://docs.astral.sh/uv/). `JEV_PROVIDER` defaults to `local`.
+
 ## Hermes and OpenClaw
 
 Yes, locally. The MCP process does not need JEV or a gateway:

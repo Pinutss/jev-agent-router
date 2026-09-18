@@ -1,0 +1,37 @@
+{
+  "name": "jev-agent-router",
+  "displayName": "JEV Agent Router",
+  "version": "0.1.0",
+  "description": "Picks one agent for a task, explains the choice, abstains, or falls back once.",
+  "author": {
+    "name": "Pinuts",
+    "url": "https://github.com/Pinutss"
+  },
+  "homepage": "https://github.com/Pinutss/jev-agent-router",
+  "repository": "https://github.com/Pinutss/jev-agent-router",
+  "license": "MIT",
+  "keywords": [
+    "agent-router",
+    "routing",
+    "permissions",
+    "mcp",
+    "jev"
+  ],
+  "logo": "assets/logo.svg",
+  "category": "agents",
+  "mcpServers": {
+    "jev-agent": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--project",
+        "${CURSOR_PLUGIN_ROOT}",
+        "jev-agent",
+        "mcp"
+      ],
+      "env": {
+        "JEV_PROVIDER": "local"
+      }
+    }
+  }
+}
