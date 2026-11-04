@@ -127,5 +127,5 @@ def _read_message(stdin: Any) -> dict[str, Any] | None:
 
 def _write_message(stdout: Any, message: dict[str, Any]) -> None:
     raw = json.dumps(message, ensure_ascii=False).encode("utf-8")
-    stdout.write(f"Content-Length: {len(raw)}\r\n\r\n".encode("ascii") + raw)
+    stdout.write(raw + b"\n")
     stdout.flush()
